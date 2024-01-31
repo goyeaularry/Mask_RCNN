@@ -239,20 +239,27 @@ def apply_box_deltas_graph(boxes, deltas):
 
 def clip_boxes_graph(boxes, window):
     """
-    boxes: [N, (y1, x1, y2, x2)]
+    boxes: [batch, N, (y1, x1, y2, x2)]
     window: [4] in the form y1, x1, y2, x2
     """
-    
-    # Split
+    # Handle the potential extra batch dimension
+    if len(boxes.shape) == 3:
+        # If there is an extra dimension, iterate over it
+        return tf.map_fn(lambda x: clip_boxes_single_graph(x, window), boxes, dtype=tf.float32)
+    else:
+        # Otherwise, process as before
+        return clip_boxes_single_graph(boxes, window)
+
+def clip_boxes_single_graph(boxes, window):
+    # Original contents of clip_boxes_graph
     wy1, wx1, wy2, wx2 = tf.split(window, 4)
     y1, x1, y2, x2 = tf.split(boxes, 4, axis=1)
-    # Clip
     y1 = tf.maximum(tf.minimum(y1, wy2), wy1)
     x1 = tf.maximum(tf.minimum(x1, wx2), wx1)
     y2 = tf.maximum(tf.minimum(y2, wy2), wy1)
     x2 = tf.maximum(tf.minimum(x2, wx2), wx1)
     clipped = tf.concat([y1, x1, y2, x2], axis=1, name="clipped_boxes")
-    clipped.set_shape((clipped.shape[0], 4))
+    clipped.set_shape([clipped.shape[0], 4])
     return clipped
 
 class ProposalLayer(layers.Layer):
@@ -293,7 +300,7 @@ class ProposalLayer(layers.Layer):
 
         # Clip to image boundaries
         window = tf.constant([0, 0, 1, 1], dtype=tf.float32)
-        boxes = clip_boxes_graph(boxes[0], window)
+        boxes = clip_boxes_graph(boxes, window)
 
         # Non-max suppression
         def nms(boxes, scores):
@@ -303,7 +310,7 @@ class ProposalLayer(layers.Layer):
             proposals = tf.pad(proposals, [(0, padding), (0, 0)])
             return proposals
 
-        proposals = nms(boxes, scores[0])
+        proposals = nms(boxes, scores)
         return proposals
 
     def compute_output_shape(self, input_shape):
