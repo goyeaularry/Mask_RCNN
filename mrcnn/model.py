@@ -277,7 +277,7 @@ class ProposalLayer(layers.Layer):
 
     def call(self, inputs):
         scores = inputs[0][:, :, 1]  # Use the foreground class confidence.
-        deltas = inputs[1] * tf.reshape(self.config.RPN_BBOX_STD_DEV, [1, 1, 4])
+	deltas = inputs[1] * tf.reshape(tf.cast(self.config.RPN_BBOX_STD_DEV, tf.float32), [1, 1, 4])
         anchors = inputs[2]
 
         # Improving performance by trimming to top anchors by score
