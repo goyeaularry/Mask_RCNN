@@ -379,6 +379,8 @@ class PyramidROIAlign(layers.Layer):
         w = x2 - x1
         image_shape = parse_image_meta_graph(image_meta)['image_shape'][0]
         image_area = tf.cast(image_shape[0] * image_shape[1], tf.float32)
+        h = tf.cast(h, tf.float32)
+        w = tf.cast(w, tf.float32)
         roi_level = log2_graph(tf.sqrt(h * w) / (224.0 / tf.sqrt(image_area)))
         roi_level = tf.minimum(5, tf.maximum(2, 4 + tf.cast(tf.round(roi_level), tf.int32)))
         roi_level = tf.squeeze(roi_level, 2)
