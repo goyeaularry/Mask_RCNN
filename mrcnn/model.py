@@ -303,7 +303,7 @@ class ProposalLayer(layers.Layer):
             proposals = tf.pad(proposals, [(0, padding), (0, 0)])
             return proposals
 
-        proposals = nms(boxes, scores)
+        proposals = nms(boxes, scores[0])
         return proposals
 
     def compute_output_shape(self, input_shape):
