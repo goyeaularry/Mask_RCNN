@@ -303,14 +303,14 @@ class ProposalLayer(layers.Layer):
         boxes = clip_boxes_graph(boxes, window)
 
         def nms_per_batch_element(boxes, scores):
-	    """
-	    Apply non-maximum suppression (NMS) to each batch element independently.
+            """
+            Apply non-maximum suppression (NMS) to each batch element independently.
 	    
-	    boxes: Tensor of shape [batch_size, num_boxes, 4]
-	    scores: Tensor of shape [batch_size, num_boxes]
-	    proposal_count: Integer, number of proposal boxes to keep after NMS
-	    nms_threshold: Float, IoU threshold for NMS
-	    """
+            boxes: Tensor of shape [batch_size, num_boxes, 4]
+            scores: Tensor of shape [batch_size, num_boxes]
+            proposal_count: Integer, number of proposal boxes to keep after NMS
+            nms_threshold: Float, IoU threshold for NMS
+            """
             # Non-max suppression
             def nms(boxes, scores):
                 indices = tf.image.non_max_suppression(boxes, scores, self.proposal_count, self.nms_threshold)
@@ -318,12 +318,12 @@ class ProposalLayer(layers.Layer):
                 padding = tf.maximum(self.proposal_count - tf.shape(proposals)[0], 0)
                 proposals = tf.pad(proposals, [(0, padding), (0, 0)])
                 return proposals
+
+            # Apply NMS to each element in the batch
+            batch_indices = tf.map_fn(
+                nms_fn, (boxes, scores), dtype=tf.int32, parallel_iterations=32)
 	
-	    # Apply NMS to each element in the batch
-	    batch_indices = tf.map_fn(
-	        nms_fn, (boxes, scores), dtype=tf.int32, parallel_iterations=32)
-	
-	    return batch_indices
+            return batch_indices
 
         proposals = nms_per_batch_element(boxes, scores)
         return proposals
