@@ -397,6 +397,7 @@ class PyramidROIAlign(layers.Layer):
             level_boxes = tf.stop_gradient(level_boxes)
             box_indices = tf.stop_gradient(box_indices)
 
+            level_boxes = tf.cast(level_boxes, tf.float32)
             pooled_features = tf.image.crop_and_resize(
                 feature_maps[i], level_boxes, box_indices, self.pool_shape,
                 method="bilinear")
