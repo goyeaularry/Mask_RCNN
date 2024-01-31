@@ -321,7 +321,7 @@ class ProposalLayer(layers.Layer):
 
             # Apply NMS to each element in the batch
             batch_indices = tf.map_fn(
-                lambda x: nms_fn(x[0], x[1]), 
+                lambda x: nms(x[0], x[1]), 
                 (boxes, scores), 
                 dtype=tf.int32,
                 parallel_iterations=32)
