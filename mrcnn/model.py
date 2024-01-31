@@ -2073,8 +2073,7 @@ class MaskRCNN():
         exclude: list of layer names to exclude
         """
         import h5py
-        from tensorflow.keras.saving.hdf5_format import load_weights_from_hdf5_group
-        from tensorflow.keras.saving.hdf5_format import load_weights_from_hdf5_group_by_name
+        from tensorflow.python.keras.saving import hdf5_format
 
         if exclude:
             by_name = True
@@ -2096,9 +2095,9 @@ class MaskRCNN():
             layers = filter(lambda l: l.name not in exclude, layers)
 
         if by_name:
-            load_weights_from_hdf5_group_by_name(f, layers)
+            hdf5_format.load_weights_from_hdf5_group_by_name(f, layers)
         else:
-            load_weights_from_hdf5_group(f, layers)
+            hdf5_format.load_weights_from_hdf5_group(f, layers)
         if hasattr(f, 'close'):
             f.close()
 
