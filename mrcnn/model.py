@@ -302,7 +302,7 @@ class ProposalLayer(layers.Layer):
         window = tf.constant([0, 0, 1, 1], dtype=tf.float32)
         boxes = clip_boxes_graph(boxes, window)
 
-	def nms_per_batch_element(boxes, scores):
+        def nms_per_batch_element(boxes, scores):
 	    """
 	    Apply non-maximum suppression (NMS) to each batch element independently.
 	    
