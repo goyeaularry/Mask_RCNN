@@ -242,6 +242,7 @@ def clip_boxes_graph(boxes, window):
     boxes: [N, (y1, x1, y2, x2)]
     window: [4] in the form y1, x1, y2, x2
     """
+    tf.debugging.assert_equal(tf.shape(boxes)[1], 4, message="boxes tensor must be of shape [N, 4]")
     # Split
     wy1, wx1, wy2, wx2 = tf.split(window, 4)
     y1, x1, y2, x2 = tf.split(boxes, 4, axis=1)
